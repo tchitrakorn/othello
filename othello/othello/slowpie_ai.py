@@ -103,10 +103,8 @@ def get_best_moves(board, color, all_moves):
     adj_corner_moves = []
     adj_sides = []
     other_moves = []
-    killers = []
 
     for move in all_moves:
-        # if this move ends up with 0 opponent on the board, put this move in the killers [] (or return it immediately)
         if move in corners:
             if len(corner_moves) == 0 or not is_half_done:
                 corner_moves.append(move)
@@ -255,11 +253,11 @@ def alphabeta_min_node(board, color, depth, alpha, beta, start_time):
     if len(opp_moves) == 0:
         return (compute_utility(board, color), None)
 
-    # if time.time() - start_time > 9.5:
-    #     return (compute_heuristic(board, color), None)
-
-    if depth == 0:
+    if time.time() - start_time > 9.5:
         return (compute_heuristic(board, color), None)
+
+    # if depth == 0:
+    #     return (compute_heuristic(board, color), None)
     
     global_move = None
     global_min = sys.maxsize
@@ -286,11 +284,11 @@ def alphabeta_max_node(board, color, depth, alpha, beta, start_time):
     if len(opp_moves) == 0 :
         return (compute_utility(board, color), None)
 
-    # if time.time() - start_time > 9.5:
-    #     return (compute_heuristic(board, color), None)
-
-    if depth == 0:
+    if time.time() - start_time > 9.5:
         return (compute_heuristic(board, color), None)
+
+    # if depth == 0:
+    #     return (compute_heuristic(board, color), None)
     
     global_move = None
     global_max = -sys.maxsize - 1
