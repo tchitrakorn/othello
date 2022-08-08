@@ -80,13 +80,14 @@ def compute_side_captured(board, color):
 def compute_mobility(board, color):
     return len(get_possible_moves(board, color))
 
-def get_best_moves(board, all_moves):
+def get_best_moves(board, color, all_moves):
     corners = [ (0, 0), (len(board) - 1, len(board) - 1), (0, len(board) - 1), (len(board) - 1, 0) ]
     adj_corners  =[ (0, 1), (1, 0), (1, 1), (0, len(board) - 2), (1, len(board) - 1), (1, len(board) - 2), 
     (len(board) - 1, 1), (len(board) - 2, 0), (len(board) - 2, 1), (len(board) - 1, len(board) - 2), 
     (len(board) - 2, len(board) - 1), (len(board) - 2, len(board) - 2) ]
     
     corner_moves = []
+    sides = []
     adj_corner_moves = []
     other_moves = []
 
@@ -95,11 +96,17 @@ def get_best_moves(board, all_moves):
             corner_moves.append(move)
         elif move in adj_corners:
             adj_corner_moves.append(move)
+        elif move[0] == 0 or move[0] == (len(board) - 1):
+            sides.append(move)
+        elif move[1] == 0 or move[1] == (len(board) - 1):
+            sides.append(move)
         else:
             other_moves.append(move)
     
     if len(corner_moves) != 0:
         return corner_moves
+    elif len(sides) != 0:
+        return sides
     elif len(other_moves) != 0:
         return other_moves
     return adj_corner_moves
@@ -120,7 +127,7 @@ def minimax_min_node(board, color, depth):
     global_move = None
     global_min = sys.maxsize
 
-    opp_moves = get_best_moves(board, opp_moves)
+    opp_moves = get_best_moves(board, color, opp_moves)
     
     for move in opp_moves:
         new_board = play_move(board, color, move[0], move[1]) 
@@ -147,7 +154,7 @@ def minimax_max_node(board, color, depth):
     global_move = None
     global_max = -sys.maxsize - 1
 
-    opp_moves = get_best_moves(board, opp_moves)
+    opp_moves = get_best_moves(board, color, opp_moves)
     
     for move in opp_moves:
         new_board = play_move(board, color, move[0], move[1]) 
@@ -188,7 +195,7 @@ def alphabeta_min_node(board, color, depth, alpha, beta):
     global_move = None
     global_min = sys.maxsize
 
-    opp_moves = get_best_moves(board, opp_moves)
+    opp_moves = get_best_moves(board, color, opp_moves)
 
     for move in opp_moves:
         new_board = play_move(board, color, move[0], move[1]) 
@@ -216,7 +223,7 @@ def alphabeta_max_node(board, color, depth, alpha, beta):
     global_move = None
     global_max = -sys.maxsize - 1
 
-    opp_moves = get_best_moves(board, opp_moves)
+    opp_moves = get_best_moves(board, color, opp_moves)
     
     for move in opp_moves:
         new_board = play_move(board, color, move[0], move[1]) 
@@ -231,7 +238,7 @@ def alphabeta_max_node(board, color, depth, alpha, beta):
 
 
 def select_move_alphabeta(board, color): 
-    return alphabeta_max_node(board, color, 7, -sys.maxsize - 1, sys.maxsize)[1]
+    return alphabeta_max_node(board, color, 9, -sys.maxsize - 1, sys.maxsize)[1]
 
 
 ####################################################
