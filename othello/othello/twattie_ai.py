@@ -23,10 +23,16 @@ def compute_utility(board, color):
     return score[1] - score[0]
 
 def compute_heuristic(board, color):
+
     score = 0
-    parity = compute_utility(board, color) / (len(board) * len(board)) * 25
-    corner_captured = compute_corner_captured(board, color) / 4 * 75
-    score = parity + corner_captured
+
+    parity = compute_utility(board, color) / (len(board) * len(board)) * 10
+    corner_captured = compute_corner_captured(board, color) / 4 * 70
+    side_captured = compute_side_captured(board, color) / ((len(board) * 4) - 4) * 20
+    # mobility = compute_mobility(board, color) / (len(board) * len(board)) * 5
+
+    score = parity + corner_captured + side_captured
+
     return score
 
 def compute_corner_captured(board, color):
@@ -56,6 +62,48 @@ def compute_corner_captured(board, color):
     #logging.info(result)
     return result
 
+def compute_side_captured(board, color):
+    
+    result = 0
+    side_value = 50
+
+    for row in range(0, len(board)):
+        result += side_value if board[row][0] == color else 0
+        result += side_value if board[row][len(board) - 1] == color else 0
+
+    for col in range(1, len(board) - 1):
+        result += side_value if board[0][col] == color else 0
+        result += side_value if board[len(board) - 1][col] == color else 0
+
+    return result
+
+def compute_mobility(board, color):
+    return len(get_possible_moves(board, color))
+
+def get_best_moves(board, all_moves):
+    corners = [ (0, 0), (len(board) - 1, len(board) - 1), (0, len(board) - 1), (len(board) - 1, 0) ]
+    adj_corners  =[ (0, 1), (1, 0), (1, 1), (0, len(board) - 2), (1, len(board) - 1), (1, len(board) - 2), 
+    (len(board) - 1, 1), (len(board) - 2, 0), (len(board) - 2, 1), (len(board) - 1, len(board) - 2), 
+    (len(board) - 2, len(board) - 1), (len(board) - 2, len(board) - 2) ]
+    
+    corner_moves = []
+    adj_corner_moves = []
+    other_moves = []
+
+    for move in all_moves:
+        if move in corners:
+            corner_moves.append(move)
+        elif move in adj_corners:
+            adj_corner_moves.append(move)
+        else:
+            other_moves.append(move)
+    
+    if len(corner_moves) != 0:
+        return corner_moves
+    elif len(other_moves) != 0:
+        return other_moves
+    return adj_corner_moves
+
 ############ MINIMAX ###############################
 
 def minimax_min_node(board, color, depth):
@@ -71,6 +119,8 @@ def minimax_min_node(board, color, depth):
     
     global_move = None
     global_min = sys.maxsize
+
+    opp_moves = get_best_moves(board, opp_moves)
     
     for move in opp_moves:
         new_board = play_move(board, color, move[0], move[1]) 
@@ -96,6 +146,8 @@ def minimax_max_node(board, color, depth):
     
     global_move = None
     global_max = -sys.maxsize - 1
+
+    opp_moves = get_best_moves(board, opp_moves)
     
     for move in opp_moves:
         new_board = play_move(board, color, move[0], move[1]) 
@@ -135,7 +187,9 @@ def alphabeta_min_node(board, color, depth, alpha, beta):
     
     global_move = None
     global_min = sys.maxsize
-    
+
+    opp_moves = get_best_moves(board, opp_moves)
+
     for move in opp_moves:
         new_board = play_move(board, color, move[0], move[1]) 
         current_min, current_move = alphabeta_max_node(new_board, opp_color, depth - 1, alpha, beta)
@@ -161,6 +215,8 @@ def alphabeta_max_node(board, color, depth, alpha, beta):
     
     global_move = None
     global_max = -sys.maxsize - 1
+
+    opp_moves = get_best_moves(board, opp_moves)
     
     for move in opp_moves:
         new_board = play_move(board, color, move[0], move[1]) 
@@ -175,7 +231,7 @@ def alphabeta_max_node(board, color, depth, alpha, beta):
 
 
 def select_move_alphabeta(board, color): 
-    return alphabeta_max_node(board, color, 6, -sys.maxsize - 1, sys.maxsize)[1]
+    return alphabeta_max_node(board, color, 7, -sys.maxsize - 1, sys.maxsize)[1]
 
 
 ####################################################
