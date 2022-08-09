@@ -13,6 +13,12 @@ import sys
 import time
 import logging
 
+
+# strategies to improve
+    # take adjacent to the sides and corners once those are captured by Twattie
+    # killer move - finish off opponents when seeing that we could end the game early
+    # mobilty - take twattie's and opponent's mobility into consideration
+
 # You can use the functions in othello_shared to write your AI 
 from othello_shared import find_lines, get_possible_moves, get_score, play_move
 
@@ -160,11 +166,11 @@ def get_best_moves(board, color, all_moves):
     
     if len(corner_moves) != 0:
         output += corner_moves
-    elif len(sides) != 0:
+    if len(sides) != 0:
         output += sides
-    elif len(other_moves) != 0:
+    if len(other_moves) != 0:
         output += other_moves
-    elif len(adj_corner_moves) != 0:
+    if len(adj_corner_moves) != 0:
         output += adj_corner_moves
     output += adj_sides
     return output
@@ -255,11 +261,12 @@ def alphabeta_min_node(board, color, depth, alpha, beta, start_time):
     if len(opp_moves) == 0:
         return (compute_utility(board, color), None)
 
-    # if time.time() - start_time > 9.5:
-    #     return (compute_heuristic(board, color), None)
-
-    if depth == 0:
+    if depth == 0 or time.time() - start_time  > 9.9:
         return (compute_heuristic(board, color), None)
+
+    # if time.time() - start_time > 9.9:
+    #     new_board = play_move(board, color, best_move[0], best_move[1]) 
+    #     return (compute_heuristic(new_board, color), None)
     
     global_move = None
     global_min = sys.maxsize
@@ -286,11 +293,12 @@ def alphabeta_max_node(board, color, depth, alpha, beta, start_time):
     if len(opp_moves) == 0 :
         return (compute_utility(board, color), None)
 
-    # if time.time() - start_time > 9.5:
-    #     return (compute_heuristic(board, color), None)
-
-    if depth == 0:
+    if depth == 0 or time.time() - start_time > 9.9:
         return (compute_heuristic(board, color), None)
+
+    # if time.time() - start_time > 9.9:
+    #     new_board = play_move(board, color, best_move[0], best_move[1]) 
+    #     return (compute_heuristic(new_board, color), None)
     
     global_move = None
     global_max = -sys.maxsize - 1
@@ -322,7 +330,7 @@ def run_ai():
     Then it repeatedly receives the current score and current board state
     until the game is over. 
     """
-    print("Minimax AI") # First line is the name of this AI  
+    print("Twattie AI") # First line is the name of this AI  
     color = int(input()) # Then we read the color: 1 for dark (goes first), 
                          # 2 for light. 
 
